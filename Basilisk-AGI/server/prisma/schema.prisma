@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// User table
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Lead {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    String   @default("NOVO")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leads")
+}
+
+// Article table
+model Article {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  subtitle  String?
+  content   String
+  category  String
+  image     String?
+  active    Boolean  @default(true)
+  featured  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Testimonial/Review table
+model Testimonial {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  author    String
+  position  String
+  image     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Team table
+model Team {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  position    String
+  description String
+  image       String?
+  email       String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("team")
+}
+
+// Site Configuration - White Label System
+model SiteConfig {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Branding
+  siteName        String   @default("Meu Site")
+  logo            String?
+  favicon         String?
+  
+  // Theme Colors
+  primaryColor    String   @default("#8B4513")
+  secondaryColor  String   @default("#D4AF37")
+  accentColor     String   @default("#4A5568")
+  
+  // Hero Section
+  heroTitle       String   @default("Bem-vindo")
+  heroSubtitle    String   @default("Descrição do seu negócio")
+  heroImage       String?
+  heroCtaText     String   @default("Entre em Contato")
+  heroCtaLink     String?
+  heroHighlights  Json?    // Array de {icon, text}
+  
+  // About Section
+  aboutEnabled    Boolean  @default(true)
+  aboutTitle      String   @default("Sobre Nós")
+  aboutSubtitle   String?
+  aboutContent    String?
+  aboutImage      String?
+  aboutImageMobile String?
+  qualifications  Json?    // Array de {icon, text}
+  
+  // Contact Information
+  phone           String?
+  email           String?
+  whatsapp        String?
+  address         String?
+  addressComplement String?
+  city            String?
+  state           String?
+  zipCode         String?
+  mapEmbedUrl     String?
+  businessHours   String   @default("Segunda a Sexta: 9h às 18h")
+  
+  // Social Media
+  linkedin        String?
+  instagram       String?
+  facebook        String?
+  twitter         String?
+  tiktok          String?
+  youtube         String?
+  
+  // Sections Toggle
+  heroEnabled         Boolean @default(true)
+  teamEnabled         Boolean @default(true)
+  blogEnabled         Boolean @default(true)
+  testimonialsEnabled Boolean @default(true)
+  faqEnabled          Boolean @default(false)
+  ctaEnabled          Boolean @default(true)
+  
+  // Footer
+  footerDescription   String?
+  footerServices      Json?   // Array de strings
+  footerQuickLinks    Json?   // Array de {name, href}
+  footerCopyright     String  @default("Todos os direitos reservados.")
+  footerLegalText     String?
+  
+  // SEO
+  metaTitle           String?
+  metaDescription     String?
+  metaKeywords        String?
+  
+  // Additional Settings
+  customCss           String?
+  customScript        String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_config")
+}
