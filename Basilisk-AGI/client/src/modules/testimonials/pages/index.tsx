@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Star, Quote, ChevronLeft, ChevronRight, User } from "lucide-react";
 import { testimonialsApi } from "../api";
 import { Testimonial } from "../types";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 const TestimonialsSection = () => {
+  const { config } = useSiteConfig();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -102,13 +104,13 @@ const TestimonialsSection = () => {
   }
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 md:py-32" style={{ backgroundColor: config?.primaryColor || '#4ECDC4' }}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: '#000000' }}>
             O Que Nossos Clientes Dizem
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl max-w-3xl mx-auto leading-relaxed font-bold" style={{ color: '#000000' }}>
             A confiança de nossos clientes é construída através da qualidade técnica 
             e transparência em nossos serviços jurídicos.
           </p>
@@ -122,7 +124,8 @@ const TestimonialsSection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 transition-all"
+                style={{ boxShadow: '4px 4px 0px #000000' }}
                 onClick={handlePrevious}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -130,7 +133,8 @@ const TestimonialsSection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 transition-all"
+                style={{ boxShadow: '4px 4px 0px #000000' }}
                 onClick={handleNext}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -145,46 +149,46 @@ const TestimonialsSection = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {testimonials.map((testimonial, index) => (
-              <Card key={testimonial.id} className="card-shadow border-0 relative flex-shrink-0 w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.33rem)]">
+              <Card key={testimonial.id} className="border-6 border-black relative flex-shrink-0 w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.33rem)] bg-white hover:translate-x-2 hover:translate-y-2 hover:shadow-[8px_8px_0px_#000000] transition-all" style={{ boxShadow: '10px 10px 0px #000000' }}>
                 <CardContent className="p-8 pt-6">
                   {/* Quote icon */}
                   <div className="flex justify-start mb-4">
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                      <Quote className="w-4 h-4 text-primary-foreground" />
+                    <div className="w-8 h-8 bg-yellow-300 border-4 border-black flex items-center justify-center">
+                      <Quote className="w-4 h-4" style={{ color: '#000000' }} />
                     </div>
                   </div>
 
                   {/* Stars */}
                   <div className="flex space-x-1 mb-6">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-gold-accent fill-current" />
+                      <Star key={i} className="w-5 h-5 fill-current" style={{ color: '#FFE951' }} />
                     ))}
                   </div>
 
                   {/* Content */}
-                  <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  <p className="leading-relaxed mb-6 font-bold" style={{ color: '#000000' }}>
                     "{testimonial.content}"
                   </p>
 
                   {/* Client info with image */}
-                  <div className="border-t border-border pt-4">
+                  <div className="border-t-4 border-black pt-4">
                     <div className="flex items-center space-x-3 mb-2">
                       {testimonial.image ? (
                         <img
                           src={testimonial.image}
                           alt={testimonial.author}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                          className="w-12 h-12 object-cover border-4 border-black"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20">
-                          <User className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 bg-pink-300 flex items-center justify-center border-4 border-black">
+                          <User className="w-6 h-6" style={{ color: '#000000' }} />
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-primary">
+                        <p className="font-bold" style={{ color: '#000000' }}>
                           {testimonial.author}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-bold" style={{ color: '#FF6B6B' }}>
                           {testimonial.position}
                         </p>
                       </div>
@@ -213,8 +217,8 @@ const TestimonialsSection = () => {
 
         {/* Ethics disclaimer */}
         <div className="text-center">
-          <div className="inline-block bg-primary/5 px-6 py-4 rounded-lg max-w-2xl">
-            <p className="text-sm text-muted-foreground">
+          <div className="inline-block bg-white px-6 py-4 border-4 border-black max-w-2xl" style={{ boxShadow: '8px 8px 0px #000000' }}>
+            <p className="text-sm font-bold" style={{ color: '#000000' }}>
               <strong>Nota importante:</strong> Todos os depoimentos respeitam o sigilo profissional 
               e as normas éticas da OAB.
             </p>

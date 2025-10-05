@@ -15,12 +15,10 @@ import {
   RefreshCw,
   Trash2
 } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { leadsApi } from "../api";
 import { Lead, LeadStatus } from "../types";
 import { useModal } from "@/hooks/useModal";
-import { AdminLeadsSkeleton } from "@/components/ui/admin-skeleton";
+import { PageShell } from "@/components/layout/PageShell";
 
 const AdminLeads = () => {
   const navigate = useNavigate();
@@ -106,42 +104,20 @@ const AdminLeads = () => {
     ? leads 
     : leads.filter(lead => lead.status === filterStatus);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <AdminLeadsSkeleton />
-        <Footer />
-      </div>
-    );
-  }
+  const actions = (
+    <Button onClick={loadLeads} variant="outline">
+      <RefreshCw className="w-4 h-4 mr-2" />
+      Atualizar
+    </Button>
+  );
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="container mx-auto px-4 py-8 mt-32">
-        {/* Cabeçalho */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
-            <div>
-              <h1 className="text-3xl font-playfair font-bold text-primary">
-                Gerenciar Respostas
-              </h1>
-              <p className="text-muted-foreground">
-                Gerencie os contatos recebidos através do formulário
-              </p>
-            </div>
-          </div>
-          
-          <Button onClick={loadLeads} variant="outline">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Atualizar
-          </Button>
-        </div>
+    <PageShell
+      title="Gerenciar Leads"
+      subtitle="Gerencie os contatos recebidos através do formulário"
+      actions={actions}
+      loading={loading}
+    >
 
         {/* Estatísticas */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -320,9 +296,7 @@ const AdminLeads = () => {
             ))
           )}
         </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 };
 

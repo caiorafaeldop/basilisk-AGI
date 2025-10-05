@@ -77,6 +77,23 @@ model Team {
   @@map("team")
 }
 
+// Image Management System
+model Image {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId  // ID do usuário/conta que fez upload (opcional para admin)
+  name      String                 // Nome original do arquivo
+  url       String                 // URL da imagem (Cloudinary/S3)
+  folder    String                 // Pasta de organização (hero, logo, about, etc)
+  width     Int?                   // Largura da imagem
+  height    Int?                   // Altura da imagem
+  size      Int?                   // Tamanho em bytes
+  format    String?                // Formato (jpg, png, webp)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("images")
+}
+
 // Site Configuration - White Label System
 model SiteConfig {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -91,13 +108,35 @@ model SiteConfig {
   secondaryColor  String   @default("#D4AF37")
   accentColor     String   @default("#4A5568")
   
+  // Site Theme
+  siteTheme           String   @default("light") // light or dark
+  
+  // Design System
+  designSystem        String   @default("neobrutalism") // neobrutalism, minimalism, etc
+  
+  // Header Colors (Auto-calculated or manual)
+  headerBgColor       String?  @default("#1e293b")
+  headerTextColor     String?  @default("#ffffff")
+  headerBtnColor      String?
+  headerBtnTextColor  String?
+  useAutoHeaderColors Boolean  @default(true)
+  
+  // Extra Button in Header
+  extraBtnEnabled     Boolean  @default(false)
+  extraBtnLabel       String?
+  extraBtnLink        String?
+  extraBtnType        String?  @default("external")
+  
   // Hero Section
   heroTitle       String   @default("Bem-vindo")
   heroSubtitle    String   @default("Descrição do seu negócio")
-  heroImage       String?
+  heroImage       String?  // DEPRECATED: Manter por compatibilidade, usar heroSlides com imageId
   heroCtaText     String   @default("Entre em Contato")
+  heroCtaType     String   @default("section")  // section, whatsapp, instagram, external
   heroCtaLink     String?
   heroHighlights  Json?    // Array de {icon, text}
+  heroSlides      Json?    // Array de {title, subtitle, cta, imageId} para o carrossel
+  heroLayout      String   @default("split-center")  // split-center, full-width, overlap, zigzag, cards-grid, minimal, magazine, asymmetric, split-diagonal, floating
   
   // About Section
   aboutEnabled    Boolean  @default(true)

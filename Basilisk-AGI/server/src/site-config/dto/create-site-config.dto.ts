@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsArray, IsUrl, ValidateNested } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsUrl, ValidateNested, Min, Max, IsIn, Matches, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class HeroHighlightDto {
@@ -42,14 +42,17 @@ export class CreateSiteConfigDto {
   // Theme Colors
   @IsOptional()
   @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'primaryColor deve ser uma cor hexadecimal válida (ex: #FF0000)' })
   primaryColor?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'secondaryColor deve ser uma cor hexadecimal válida (ex: #FF0000)' })
   secondaryColor?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'accentColor deve ser uma cor hexadecimal válida (ex: #FF0000)' })
   accentColor?: string;
 
   // Hero Section
@@ -68,6 +71,10 @@ export class CreateSiteConfigDto {
   @IsOptional()
   @IsString()
   heroCtaText?: string;
+
+  @IsOptional()
+  @IsString()
+  heroCtaType?: string;
 
   @IsOptional()
   @IsString()
@@ -246,4 +253,321 @@ export class CreateSiteConfigDto {
   @IsOptional()
   @IsString()
   customScript?: string;
+
+  // 🔥 TIPOGRAFIA COMPLETA
+  @IsOptional()
+  @IsString()
+  fontFamily?: string;
+
+  @IsOptional()
+  @IsString()
+  titleFontSize?: string;
+
+  @IsOptional()
+  @IsString()
+  titleFontWeight?: string;
+
+  @IsOptional()
+  @IsString()
+  titleLineHeight?: string;
+
+  @IsOptional()
+  @IsString()
+  titleLetterSpacing?: string;
+
+  @IsOptional()
+  @IsString()
+  subtitleFontSize?: string;
+
+  @IsOptional()
+  @IsString()
+  subtitleFontWeight?: string;
+
+  @IsOptional()
+  @IsString()
+  subtitleLineHeight?: string;
+
+  @IsOptional()
+  @IsString()
+  bodyFontSize?: string;
+
+  @IsOptional()
+  @IsString()
+  bodyFontWeight?: string;
+
+  @IsOptional()
+  @IsString()
+  bodyLineHeight?: string;
+
+  // 🔥 ESPAÇAMENTOS
+  @IsOptional()
+  @IsString()
+  sectionSpacing?: string;
+
+  @IsOptional()
+  @IsString()
+  cardPadding?: string;
+
+  @IsOptional()
+  @IsString()
+  buttonPadding?: string;
+
+  @IsOptional()
+  @IsString()
+  headerPadding?: string;
+
+  @IsOptional()
+  @IsString()
+  heroPaddingTop?: string;
+
+  @IsOptional()
+  @IsString()
+  heroPaddingBottom?: string;
+
+  // 🔥 BOTÕES AVANÇADOS
+  @IsOptional()
+  @IsString()
+  buttonRadius?: string;
+
+  @IsOptional()
+  @IsString()
+  buttonShadow?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'buttonShadowColor deve ser uma cor hexadecimal válida' })
+  buttonShadowColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['lift', 'scale', 'glow', 'pulse', 'none'], { message: 'buttonHoverEffect deve ser: lift, scale, glow, pulse ou none' })
+  buttonHoverEffect?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'buttonHoverColor deve ser uma cor hexadecimal válida' })
+  buttonHoverColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['sm', 'md', 'lg', 'xl'], { message: 'buttonSize deve ser: sm, md, lg ou xl' })
+  buttonSize?: string;
+
+  // 🔥 HEADER AVANÇADO
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'headerOpacity deve ser entre 0 e 1' })
+  @Max(1, { message: 'headerOpacity deve ser entre 0 e 1' })
+  headerOpacity?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'headerBlur deve ser entre 0 e 50' })
+  @Max(50, { message: 'headerBlur deve ser entre 0 e 50' })
+  headerBlur?: number;
+
+  @IsOptional()
+  @IsString()
+  headerHeight?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['fixed', 'sticky', 'static'], { message: 'headerPosition deve ser: fixed, sticky ou static' })
+  headerPosition?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['fade', 'slide', 'shrink', 'none'], { message: 'headerAnimation deve ser: fade, slide, shrink ou none' })
+  headerAnimation?: string;
+
+  @IsOptional()
+  @IsString()
+  headerShadow?: string;
+
+  // 🔥 IMAGENS COM FILTROS
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'imageBrightness deve ser entre 0 e 200' })
+  @Max(200, { message: 'imageBrightness deve ser entre 0 e 200' })
+  imageBrightness?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'imageContrast deve ser entre 0 e 200' })
+  @Max(200, { message: 'imageContrast deve ser entre 0 e 200' })
+  imageContrast?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'imageSaturation deve ser entre 0 e 200' })
+  @Max(200, { message: 'imageSaturation deve ser entre 0 e 200' })
+  imageSaturation?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'imageBlur deve ser entre 0 e 20' })
+  @Max(20, { message: 'imageBlur deve ser entre 0 e 20' })
+  imageBlur?: number;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^#[0-9A-F]{6}$/i, { message: 'imageOverlayColor deve ser uma cor hexadecimal válida' })
+  imageOverlayColor?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'imageOverlayOpacity deve ser entre 0 e 100' })
+  @Max(100, { message: 'imageOverlayOpacity deve ser entre 0 e 100' })
+  imageOverlayOpacity?: number;
+
+  // 🔥 ANIMAÇÕES
+  @IsOptional()
+  @IsString()
+  transitionSpeed?: string;
+
+  @IsOptional()
+  @IsString()
+  animationDelay?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  enableParallax?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  enableFadeIn?: boolean;
+
+  @IsOptional()
+  @IsString()
+  cardHoverEffect?: string;
+
+  // 🔥 FOOTER COMPLETO
+  @IsOptional()
+  @IsString()
+  footerBg?: string;
+
+  @IsOptional()
+  @IsString()
+  footerTextColor?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  footerShowSocial?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  footerShowNewsletter?: boolean;
+
+  @IsOptional()
+  @IsString()
+  footerNewsletterTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  footerNewsletterSubtitle?: string;
+
+  // 🔥 SEO AVANÇADO
+  @IsOptional()
+  @IsString()
+  ogTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  ogDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  ogImage?: string;
+
+  @IsOptional()
+  @IsString()
+  twitterCard?: string;
+
+  @IsOptional()
+  @IsString()
+  googleAnalyticsId?: string;
+
+  @IsOptional()
+  @IsString()
+  facebookPixelId?: string;
+
+  // 🔥 NOVAS SEÇÕES
+  @IsOptional()
+  @IsBoolean()
+  galleryEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  videoEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  counterEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  partnersEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  timelineEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  pricingEnabled?: boolean;
+
+  // Design System & Theme
+  @IsOptional()
+  @IsString()
+  siteTheme?: string;
+
+  @IsOptional()
+  @IsString()
+  designSystem?: string;
+
+  @IsOptional()
+  @IsString()
+  heroLayout?: string;
+
+  @IsOptional()
+  @IsString()
+  heroCtaAction?: string;
+
+  // Header Colors
+  @IsOptional()
+  @IsString()
+  headerBgColor?: string;
+
+  @IsOptional()
+  @IsString()
+  headerTextColor?: string;
+
+  @IsOptional()
+  @IsString()
+  headerBtnColor?: string;
+
+  @IsOptional()
+  @IsString()
+  headerBtnTextColor?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  useAutoHeaderColors?: boolean;
+
+  // Extra Button
+  @IsOptional()
+  @IsBoolean()
+  extraBtnEnabled?: boolean;
+
+  @IsOptional()
+  @IsString()
+  extraBtnLabel?: string;
+
+  @IsOptional()
+  @IsString()
+  extraBtnLink?: string;
+
+  @IsOptional()
+  @IsString()
+  extraBtnType?: string;
 }

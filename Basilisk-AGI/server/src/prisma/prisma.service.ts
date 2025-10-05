@@ -6,13 +6,20 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  constructor() {
+    super({
+      // Configurações para MongoDB local sem replica set
+      log: ['warn', 'error'],
+    });
+  }
+
   async onModuleInit() {
     try {
       console.log('🔄 Tentando conectar ao MongoDB...');
-      console.log('🔗 Cluster:', process.env.DATABASE_URL?.match(/[@]([^.]+)/)?.[1] || 'Unknown');
+      console.log('🔗 Cluster:', process.env.DATABASE_URL?.match(/[@]([^.]+)/)?.[1] || 'Local');
       console.log('🌍 Environment:', process.env.NODE_ENV);
       console.log('🖥️ Platform:', process.env.RENDER ? 'Render' : 'Local');
-      console.log('📊 Database: MongoDB Atlas');
+      console.log('📊 Database: MongoDB');
       
       // Timeout personalizado
       const connectPromise = this.$connect();
@@ -23,6 +30,7 @@ export class PrismaService
       await Promise.race([connectPromise, timeoutPromise]);
       
       console.log('✅ MongoDB connected successfully');
+      console.log('⚠️ Running without transactions (local MongoDB)');
     } catch (error) {
       console.error('❌ MongoDB connection failed:', error.message);
       console.error('❌ Error type:', error.constructor.name);

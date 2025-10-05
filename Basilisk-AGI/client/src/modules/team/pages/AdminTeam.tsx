@@ -12,6 +12,7 @@ import { useModal } from "@/hooks/useModal";
 import { useNavigate } from "react-router-dom";
 import { teamApi } from "../api";
 import { TeamMember, CreateTeamMemberRequest, UpdateTeamMemberRequest } from "../types";
+import { PageShell } from "@/components/layout/PageShell";
 
 const AdminTeam = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);

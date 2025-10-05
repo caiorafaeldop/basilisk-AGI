@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Linkedin, Instagram } from "lucide-react";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 // Custom TikTok Icon
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -10,13 +11,13 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 
 const Footer = () => {
-  const quickLinks = [
+  const { config } = useSiteConfig();
+  
+  const quickLinks = config?.footerQuickLinks || [
     { name: "Início", href: "#inicio" },
-    { name: "Para Trabalhadores", href: "#trabalhadores" },  
     { name: "Sobre", href: "#sobre" },
     { name: "Blog", href: "#blog" },
     { name: "Contato", href: "#contato" },
-    { name: "Localização", href: "#localizacao" }
   ];
 
   const handleNavClick = (href: string) => {
@@ -35,68 +36,65 @@ const Footer = () => {
     }
   };
 
-  const services = [
-    "Ações Trabalhistas",
-    "Consultoria Preventiva",
-    "Auditoria Trabalhista",
-    "Contratos de Trabalho",
-    "Mediação de Conflitos",
-    "Treinamento Corporativo"
-  ];
+  const services = config?.footerServices || [];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50 text-slate-100">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and description */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <h3 className="text-2xl font-playfair font-bold mb-2">
-                Paulo Maia Advocacia
+              <h3 className="text-2xl font-bold mb-2 text-white">
+                {config?.siteName || 'Meu Site'}
               </h3>
-              <p className="text-primary-foreground/80">
-                Especialista em Direito Trabalhista
-              </p>
             </div>
-            <p className="text-primary-foreground/70 leading-relaxed mb-6">
-              Soluções trabalhistas com excelência e ética, defendendo direitos 
-              de trabalhadores há mais de 30 anos.
-            </p>
+            {config?.footerDescription && (
+              <p className="text-slate-300 leading-relaxed mb-6">
+                {config.footerDescription}
+              </p>
+            )}
             
-            {/* Social media - Estilo igual ao header */}
+            {/* Social media */}
             <div className="flex flex-wrap gap-4">
-              <a 
-                href="https://www.linkedin.com/in/paulo-maia-advogado" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground hover:text-white smooth-transition"
-                title="LinkedIn"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://www.instagram.com/paulomaiaadvocacia/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground hover:text-white smooth-transition"
-                title="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://www.tiktok.com/@paulomaiaadv?_t=ZM-8zwTXi6FvTc&_r=1" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground hover:text-white smooth-transition"
-                title="TikTok"
-              >
-                <TikTokIcon className="w-5 h-5" />
-              </a>
+              {config?.linkedin && (
+                <a 
+                  href={config.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 hover:text-white smooth-transition"
+                  title="LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              )}
+              {config?.instagram && (
+                <a 
+                  href={config.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 hover:text-white smooth-transition"
+                  title="Instagram"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+              )}
+              {config?.tiktok && (
+                <a 
+                  href={config.tiktok} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 hover:text-white smooth-transition"
+                  title="TikTok"
+                >
+                  <TikTokIcon className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-6">
+            <h4 className="text-lg font-semibold mb-6 text-white">
               Links Rápidos
             </h4>
             <ul className="space-y-3">
@@ -104,7 +102,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <button 
                     onClick={() => handleNavClick(link.href)}
-                    className="text-primary-foreground/70 hover:text-primary-foreground smooth-transition text-left"
+                    className="text-slate-300 hover:text-white smooth-transition text-left"
                   >
                     {link.name}
                   </button>
@@ -114,64 +112,75 @@ const Footer = () => {
           </div>
 
           {/* Services */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6">
-              Serviços
-            </h4>
-            <ul className="space-y-3">
-              {services.map((service, index) => (
-                <li key={index}>
-                  <span className="text-primary-foreground/70">
-                    {service}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {services.length > 0 && (
+            <div>
+              <h4 className="text-lg font-semibold mb-6 text-white">
+                Serviços
+              </h4>
+              <ul className="space-y-3">
+                {services.map((service, index) => (
+                  <li key={index}>
+                    <span className="text-slate-300">
+                      {service}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Contact info */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">
+            <h4 className="text-lg font-semibold mb-6 text-white">
               Contato
             </h4>
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-primary-foreground/70">
-                  (83) 9109-0902
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-primary-foreground/70">
-                  contato@paulomaia.adv.br
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <MapPin className="w-5 h-5 text-primary-foreground/70" />
-                <div className="flex flex-col">
-                  <span className="text-primary-foreground/70">
-                    Green Tower - Av. Sen. Rui Carneiro 293
+              {config?.phone && (
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-5 h-5 text-slate-300" />
+                  <span className="text-slate-300">
+                    {config.phone}
                   </span>
-                  <span className="text-primary-foreground/70 text-sm">
-                    Sala 1301 - João Pessoa, PB, 58032-010
-                  </span>
-                  <button
-                    onClick={() => window.open('https://maps.google.com/?q=Green+Tower+Av.+Sen.+Rui+Carneiro+293+sala+1301+João+Pessoa+PB+58032-010', '_blank')}
-                    className="text-primary-foreground/90 hover:text-primary-foreground text-xs underline mt-1 text-left"
-                  >
-                    Ver no Google Maps
-                  </button>
                 </div>
-              </div>
+              )}
+              {config?.email && (
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-5 h-5 text-slate-300" />
+                  <span className="text-slate-300">
+                    {config.email}
+                  </span>
+                </div>
+              )}
+              {config?.address && (
+                <div className="flex items-center space-x-3">
+                  <MapPin className="w-5 h-5 text-slate-300" />
+                  <div className="flex flex-col">
+                    <span className="text-slate-300">
+                      {config.address}
+                    </span>
+                    {config.addressComplement && (
+                      <span className="text-slate-300 text-sm">
+                        {config.addressComplement}
+                      </span>
+                    )}
+                    {(config.city || config.state || config.zipCode) && (
+                      <span className="text-slate-300 text-sm">
+                        {config.city}{config.city && config.state && ', '}{config.state} {config.zipCode}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="mt-6 p-4 bg-primary-foreground/10 rounded-lg">
-              <p className="text-sm text-primary-foreground/80">
-                <strong>Horário de Atendimento:</strong><br />
-                Segunda a Sexta: 9h às 18h
-              </p>
-            </div>
+            {config?.businessHours && (
+              <div className="mt-6 p-4 bg-primary-foreground/10 rounded-lg">
+                <p className="text-sm text-primary-foreground/80">
+                  <strong>Horário de Atendimento:</strong><br />
+                  {config.businessHours}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -180,20 +189,18 @@ const Footer = () => {
         {/* Bottom section */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="text-center md:text-left">
-            <p className="text-primary-foreground/70 text-sm">
-              © 2025 Paulo Maia Advocacia. Todos os direitos reservados.
-            </p>
-            <p className="text-primary-foreground/60 text-xs mt-1">
-              OAB/SP nº 123.456 - Registro profissional ativo
+            <p className="text-slate-300 text-sm">
+              © {new Date().getFullYear()} {config?.siteName || 'Meu Site'}. {config?.footerCopyright || 'Todos os direitos reservados.'}
             </p>
           </div>
 
-          <div className="text-center md:text-right">
-            <p className="text-primary-foreground/60 text-xs max-w-md">
-              Este site tem caráter exclusivamente informativo. A advocacia é regulamentada 
-              pelo Estatuto da Advocacia e pela OAB.
-            </p>
-          </div>
+          {config?.footerLegalText && (
+            <div className="text-center md:text-right">
+              <p className="text-primary-foreground/60 text-xs max-w-md">
+                {config.footerLegalText}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </footer>

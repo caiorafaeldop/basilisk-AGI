@@ -119,12 +119,15 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Lato', sans-serif;
+    @apply text-foreground;
+    background-color: var(--site-bg-color, hsl(var(--background)));
+    color: var(--site-text-color, hsl(var(--foreground)));
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
   }
 }
 
@@ -149,4 +152,31 @@ All colors MUST be HSL.
   .smooth-transition {
     transition: var(--transition-smooth);
   }
+}
+
+/* Animações para Hero */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 3s ease-in-out infinite;
 }

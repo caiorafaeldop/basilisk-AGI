@@ -107,8 +107,9 @@ export class AuthController {
     @Body('name') name: string,
     @Body('email') email: string,
     @Body('password') password: string,
+    @Body('role') role?: string,
   ) {
-    const res = await this.authService.register(name, email, password);
+    const res = await this.authService.register(name, email, password, role);
     return res;
   }
 }

@@ -1,9 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
-import { GraduationCap, Award, Users, Shield } from "lucide-react";
+import { GraduationCap, Award, Users, Shield, Star, Briefcase } from "lucide-react";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
+import { AboutSkeleton } from "@/components/ui/about-skeleton";
+
+const iconMap: Record<string, any> = {
+  GraduationCap, Award, Users, Shield, Star, Briefcase
+};
 
 const AboutSection = () => {
+  const { config, isLoading } = useSiteConfig();
   const [imageVisible, setImageVisible] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
 
@@ -26,77 +33,70 @@ const AboutSection = () => {
     return () => observer.disconnect();
   }, []);
 
-  const qualifications = [
-    {
-      icon: <GraduationCap className="w-6 h-6" />,
-      text: "Mestre em Direito das Relações Sociais pela PUC/SP"
-    },
-    {
-      icon: <Award className="w-6 h-6" />,
-      text: "Professor de Direito"
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      text: "Ex-Presidente da OAB - PB"
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      text: "Ex-Conselheiro Federal da OAB"
-    },
-    {
-      icon: <Award className="w-6 h-6" />,
-      text: "Presidente da Comissão Nacional de Direitos Sociais da OAB"
-    }
-  ];
+  if (isLoading || !config) {
+    return <AboutSkeleton />;
+  }
+
+  if (!config.aboutEnabled) {
+    return null;
+  }
+
+  const qualifications = config.qualifications || [];
 
   return (
-    <section id="sobre" className="py-6 md:py-20 bg-background">
+    <section id="sobre" className="py-12 md:py-32" style={{ backgroundColor: config?.secondaryColor || '#F38181' }}>
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image placeholder - Desktop only */}
-          <div className="relative hidden lg:block">
-            <Card className="overflow-hidden border-0 elegant-shadow">
-              <div className="aspect-square">
-                <img
-                  src="https://res.cloudinary.com/dkcrbcfcy/image/upload/v1758593450/maia-advocacia/l8xukaskybxoqm02pkiu.jpg"
-                  alt="Dr. Paulo Maia - Advogado Trabalhista"
-                  className="w-full h-full object-cover"
-                />
+          {config.aboutImage && (
+            <div className="relative hidden lg:block">
+              <div className="overflow-hidden border-8 border-black bg-white p-2" style={{ boxShadow: '16px 16px 0px #000000' }}>
+                <div className="aspect-square">
+                  <img
+                    src={config.aboutImage}
+                    alt={config.aboutTitle}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
-            </Card>
-          </div>
+            </div>
+          )}
 
           {/* Content */}
           <div className="space-y-8">
             {/* Mobile Image - Above title com animação */}
-            <div 
-              ref={imageRef}
-              className={`block lg:hidden mb-6 transform transition-all duration-1000 ease-out ${
-                imageVisible 
-                  ? 'translate-x-0 opacity-100 scale-100' 
-                  : '-translate-x-8 opacity-0 scale-95'
-              }`}
-            >
-              <Card className="overflow-hidden border-0 elegant-shadow">
-                <div className="aspect-square">
-                  <img
-                    src="https://res.cloudinary.com/dkcrbcfcy/image/upload/v1758590979/maia-advocacia/lvql1q9gchj5owiubyg4.jpg"
-                    alt="Dr. Paulo Maia - Advogado Trabalhista"
-                    className="w-full h-full object-cover"
-                  />
+            {(config.aboutImageMobile || config.aboutImage) && (
+              <div 
+                ref={imageRef}
+                className={`block lg:hidden mb-6 transform transition-all duration-1000 ease-out ${
+                  imageVisible 
+                    ? 'translate-x-0 opacity-100 scale-100' 
+                    : '-translate-x-8 opacity-0 scale-95'
+                }`}
+              >
+                <div className="overflow-hidden border-6 border-black bg-white p-2" style={{ boxShadow: '10px 10px 0px #000000' }}>
+                  <div className="aspect-square">
+                    <img
+                      src={config.aboutImageMobile || config.aboutImage}
+                      alt={config.aboutTitle}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </Card>
-            </div>
+              </div>
+            )}
             {/* Mobile Layout - Bullet Points */}
             <div className="block lg:hidden">
               <div className="text-center mb-6">
-                <div className="w-full bg-gradient-to-r from-primary/10 to-primary/5 px-6 py-4 rounded-lg border border-primary/20 card-shadow mb-4">
-                  <h2 className="text-2xl font-playfair font-bold text-primary mb-2">
-                    DR. PAULO MAIA
+                <div className="w-full bg-white px-6 py-4 border-4 border-black mb-4" style={{ boxShadow: '8px 8px 0px #000000' }}>
+                  <h2 className="text-2xl font-bold mb-2" style={{ color: '#000000' }}>
+                    {config.aboutTitle}
                   </h2>
-                  <p className="text-lg text-gold-accent font-medium">
-                    Advogado
-                  </p>
+                  {config.aboutSubtitle && (
+                    <p className="text-lg font-bold" style={{ color: '#FFE951' }}>
+                      {config.aboutSubtitle}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -119,52 +119,60 @@ const AboutSection = () => {
 
               {/* Qualificações Mobile - Cards Estilizados */}
               <div className="space-y-3">
-                {qualifications.map((qual, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-white/50 rounded-lg border border-primary/10 card-shadow">
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-primary text-xs">{qual.icon}</span>
+                {qualifications.map((qual, index) => {
+                  const IconComponent = iconMap[qual.icon] || Award;
+                  const colors = ['#4ECDC4', '#FFE951', '#95E1D3'];
+                  return (
+                    <div key={index} className="flex items-start space-x-3 p-3 bg-white border-4 border-black" style={{ boxShadow: '6px 6px 0px #000000' }}>
+                      <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5 border-4 border-black" style={{ backgroundColor: colors[index % colors.length] }}>
+                        <IconComponent className="w-4 h-4" style={{ color: '#000000' }} />
+                      </div>
+                      <p className="text-sm font-bold leading-relaxed" style={{ color: '#000000' }}>
+                        {qual.text}
+                      </p>
                     </div>
-                    <p className="text-sm text-foreground font-medium leading-relaxed">
-                      {qual.text}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
             {/* Desktop Layout - Original */}
             <div className="hidden lg:block">
-              <div className="border border-gray-300 p-6 rounded-lg card-shadow bg-white">
+              <div className="border-8 border-black p-6 bg-white" style={{ boxShadow: '12px 12px 0px #000000' }}>
                 <div>
-                  <h2 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
-                    Dr. Paulo Maia
+                  <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: '#000000' }}>
+                    {config.aboutTitle}
                   </h2>
-                  <p className="text-xl text-gold-accent font-medium mb-6">
-                    Advogado
-                  </p>
+                  {config.aboutSubtitle && (
+                    <p className="text-xl font-bold mb-6" style={{ color: '#FFE951' }}>
+                      {config.aboutSubtitle}
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-6">
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Mestre em Direito das Relações Sociais pela PUC/SP, com vasta experiência 
-                    em Direito do Trabalho e atuação destacada na advocacia e ensino jurídico.
-                  </p>
-
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Ex-Presidente da OAB-PB e atual Conselheiro Federal da OAB, 
-                    com sólida formação acadêmica e compromisso com a excelência profissional.
-                  </p>
-                </div>
+                {config.aboutContent && (
+                  <div className="space-y-6 mb-8">
+                    <p className="text-lg leading-relaxed whitespace-pre-line font-medium" style={{ color: '#000000' }}>
+                      {config.aboutContent}
+                    </p>
+                  </div>
+                )}
 
                 {/* Qualifications Desktop */}
-                <div className="grid grid-cols-1 gap-3 mt-8">
-                  {qualifications.map((qual, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 bg-primary/5 rounded-lg card-shadow">
-                      <span className="text-primary">{qual.icon}</span>
-                      <span className="text-primary font-medium text-sm">{qual.text}</span>
-                    </div>
-                  ))}
-                </div>
+                {qualifications.length > 0 && (
+                  <div className="grid grid-cols-1 gap-3 mt-8">
+                    {qualifications.map((qual, index) => {
+                      const IconComponent = iconMap[qual.icon] || Award;
+                      const colors = ['#4ECDC4', '#FFE951', '#95E1D3'];
+                      return (
+                        <div key={index} className="flex items-start space-x-3 p-3 bg-white border-4 border-black" style={{ boxShadow: '6px 6px 0px #000000', backgroundColor: colors[index % colors.length] }}>
+                          <IconComponent className="w-5 h-5" style={{ color: '#000000' }} />
+                          <span className="font-bold text-sm" style={{ color: '#000000' }}>{qual.text}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>

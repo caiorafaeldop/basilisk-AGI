@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  ArrowLeft, 
-  ArrowRight,
-  Share2,
-  Clock,
-  User,
-  Edit
-} from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { articlesApi } from "../api";
-import { Article } from "../types";
-import { useModal } from "@/hooks/useModal";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
-import { ArticleViewSkeleton } from "@/components/ui/article-skeleton";
+import { articlesApi } from '../api';
+import { Article } from '../types';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Calendar, User, Clock, Share2, Facebook, Twitter, Linkedin, Edit, ArrowRight } from 'lucide-react';
+import { useSiteConfig } from '@/hooks/useSiteConfig';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import FloatingButtons from '@/components/FloatingButtons';
+import { sanitizeHtml } from '@/utils/sanitize';
+import { ArticleViewSkeleton } from '@/components/ui/article-skeleton';
+import { useModal } from '@/hooks/useModal';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const ArticleView: React.FC = () => {
   useScrollToTop(); // Hook para scroll automático ao topo
@@ -26,6 +21,7 @@ const ArticleView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showSuccess } = useModal();
+  const { config } = useSiteConfig();
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +29,7 @@ const ArticleView: React.FC = () => {
   
   // Verificar estado de admin
   const checkAdminStatus = () => {
-    const hasToken = localStorage.getItem('authToken');
+    const hasToken = localStorage.getItem('token');
     const hasUser = localStorage.getItem('user');
     setIsAdmin(!!(hasToken && hasUser));
   };
@@ -136,9 +132,11 @@ const ArticleView: React.FC = () => {
     navigate(`/artigo/${articleId}`);
   };
 
+  const bgColor = config?.siteTheme === 'dark' ? '#1e293b' : '#f7f7f8';
+
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: bgColor }}>
         <Header />
         <ArticleViewSkeleton />
         <Footer />
@@ -148,7 +146,7 @@ const ArticleView: React.FC = () => {
 
   if (!article) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: bgColor }}>
         <Header />
         <main className="container mx-auto px-4 py-4 md:py-8 mt-20 md:mt-32 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
           <div className="text-center">
@@ -174,7 +172,7 @@ const ArticleView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: bgColor }}>
       <Header />
       <main className="container mx-auto px-4 py-4 md:py-8 mt-20 md:mt-32 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
         {/* Navegação */}
@@ -263,7 +261,7 @@ const ArticleView: React.FC = () => {
           <div className="prose prose-lg max-w-none mb-12">
             <div 
               className="text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.content) }}
             />
           </div>
 

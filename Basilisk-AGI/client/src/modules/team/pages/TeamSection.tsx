@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, User, Users } from "lucide-react";
 import { teamApi } from "../api";
 import { TeamMember } from "../types";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 const TeamSection = () => {
+  const { config } = useSiteConfig();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -113,17 +115,17 @@ const TeamSection = () => {
   }
 
   return (
-    <section className="py-6 md:py-20 bg-background">
+    <section className="py-12 md:py-32" style={{ backgroundColor: config?.primaryColor || '#95E1D3' }}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
           <div className="md:hidden mb-6">
-            <div className="inline-block bg-gradient-to-r from-primary/10 to-primary/5 px-6 py-3 rounded-lg border border-primary/20 shadow-sm">
-              <h2 className="text-xl font-playfair font-bold text-primary">
+            <div className="inline-block bg-white px-6 py-3 border-4 border-black" style={{ boxShadow: '6px 6px 0px #000000' }}>
+              <h2 className="text-xl font-bold" style={{ color: '#000000' }}>
                 Nossa Equipe Especializada
               </h2>
             </div>
           </div>
-          <h2 className="hidden md:block text-2xl md:text-4xl lg:text-5xl font-playfair font-bold text-primary mb-4 md:mb-6">
+          <h2 className="hidden md:block text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6" style={{ color: '#000000' }}>
             Nossa Equipe Especializada
           </h2>
           {/* <p className="text-base md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -140,7 +142,8 @@ const TeamSection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 transition-all"
+                style={{ boxShadow: '4px 4px 0px #000000' }}
                 onClick={handlePrevious}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -148,7 +151,8 @@ const TeamSection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 transition-all"
+                style={{ boxShadow: '4px 4px 0px #000000' }}
                 onClick={handleNext}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -163,7 +167,7 @@ const TeamSection = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {teamMembers.map((member) => (
-              <Card key={member.id} className="card-shadow border-4 border-primary relative flex-shrink-0 w-full md:w-[calc(50%-1rem)] bg-primary/5 rounded-xl">
+              <Card key={member.id} className="border-6 border-black relative flex-shrink-0 w-full md:w-[calc(50%-1rem)] bg-white hover:translate-x-2 hover:translate-y-2 hover:shadow-[8px_8px_0px_#000000] transition-all" style={{ boxShadow: '12px 12px 0px #000000' }}>
                 <CardContent className="p-8">
                   {/* Member Image */}
                   <div className="flex justify-center mb-6">
@@ -171,24 +175,25 @@ const TeamSection = () => {
                       <img
                         src={member.image}
                         alt={member.name}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                        className="w-32 h-32 object-cover border-6 border-black"
+                        style={{ boxShadow: '6px 6px 0px #000000' }}
                       />
                     ) : (
-                      <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
-                        <User className="w-16 h-16 text-primary" />
+                      <div className="w-32 h-32 bg-yellow-300 flex items-center justify-center border-6 border-black" style={{ boxShadow: '6px 6px 0px #000000' }}>
+                        <User className="w-16 h-16" style={{ color: '#000000' }} />
                       </div>
                     )}
                   </div>
 
                   {/* Member Info */}
                   <div className="text-center">
-                    <h3 className="text-2xl font-playfair font-bold text-primary mb-2">
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: '#000000' }}>
                       {member.name}
                     </h3>
-                    <p className="text-lg text-gold-accent font-medium mb-4">
+                    <p className="text-lg font-bold mb-4" style={{ color: '#FF6B6B' }}>
                       {member.position}
                     </p>
-                    <p className="text-muted-foreground leading-relaxed text-base">
+                    <p className="leading-relaxed text-base" style={{ color: '#000000' }}>
                       {member.description}
                     </p>
                   </div>
@@ -222,7 +227,7 @@ const TeamSection = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {teamMembers.map((member) => (
-              <Card key={member.id} className="card-shadow border md:border-4 border-primary relative flex-shrink-0 w-[calc(100vw-4rem)] mr-4 last:mr-0 bg-primary/5 rounded-xl">
+              <Card key={member.id} className="border-4 border-black relative flex-shrink-0 w-[calc(100vw-4rem)] mr-4 last:mr-0 bg-white" style={{ boxShadow: '8px 8px 0px #000000' }}>
                 <CardContent className="p-4">
                   {/* Member Image */}
                   <div className="flex justify-center mb-3">
@@ -230,24 +235,25 @@ const TeamSection = () => {
                       <img
                         src={member.image}
                         alt={member.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 shadow-lg"
+                        className="w-16 h-16 object-cover border-4 border-black"
+                        style={{ boxShadow: '4px 4px 0px #000000' }}
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 shadow-lg">
-                        <User className="w-8 h-8 text-primary" />
+                      <div className="w-16 h-16 bg-yellow-300 flex items-center justify-center border-4 border-black" style={{ boxShadow: '4px 4px 0px #000000' }}>
+                        <User className="w-8 h-8" style={{ color: '#000000' }} />
                       </div>
                     )}
                   </div>
 
                   {/* Member Info */}
                   <div className="text-center">
-                    <h3 className="text-sm font-playfair font-bold text-primary mb-1">
+                    <h3 className="text-sm font-bold mb-1" style={{ color: '#000000' }}>
                       {member.name}
                     </h3>
-                    <p className="text-xs text-gold-accent font-medium mb-2">
+                    <p className="text-xs font-bold mb-2" style={{ color: '#FF6B6B' }}>
                       {member.position}
                     </p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <p className="text-xs leading-relaxed" style={{ color: '#000000' }}>
                       {member.description}
                     </p>
                   </div>

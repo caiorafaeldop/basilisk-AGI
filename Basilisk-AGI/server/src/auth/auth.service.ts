@@ -1,19 +1,23 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MongoAdapter } from 'src/prisma/mongo.adapter';
 import { PasswordUtil } from 'src/utils/password.util';
 import { JwtAuthService } from './jwt.service';
 
 @Injectable()
 export class AuthService {
+  private mongoAdapter: MongoAdapter;
+
   constructor(
     private prisma: PrismaService,
     private jwtAuthService: JwtAuthService,
-  ) {}
+  ) {
+    this.mongoAdapter = new MongoAdapter(prisma);
+  }
 
   async login(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    // Usa MongoAdapter para evitar problema de transação
+    const user = await this.mongoAdapter.findOne('User', { email });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -43,11 +47,9 @@ export class AuthService {
     };
   }
 
-  async register(name: string, email: string, password: string) {
-    // Check if user already exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
-    });
+  async register(name: string, email: string, password: string, role: string = 'admin') {
+    // Check if user already exists usando MongoAdapter
+    const existingUser = await this.mongoAdapter.findOne('User', { email });
 
     if (existingUser) {
       throw new UnauthorizedException('User already exists with this email');
@@ -56,14 +58,17 @@ export class AuthService {
     // Hash the password before saving
     const hashedPassword = await PasswordUtil.hashPassword(password);
 
-    // Create new user
-    const user = await this.prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    });
+    // Create new user usando MongoAdapter (evita problema de transação)
+    const userData = {
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const user = await this.mongoAdapter.createDocument('User', userData);
 
     // Generate JWT tokens
     const tokens = await this.jwtAuthService.generateTokens({

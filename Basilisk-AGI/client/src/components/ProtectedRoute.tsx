@@ -1,21 +1,26 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // Verificar se o usuário está autenticado
-  const isAuthenticated = () => {
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('user');
-    return token && user;
-  };
+  const { isAuthenticated, isValidating } = useAuth();
 
-  // Se não estiver autenticado, redirecionar para a página inicial
-  if (!isAuthenticated()) {
-    return <Navigate to="/" replace />;
+  // Enquanto valida, não redireciona (evita flicker)
+  if (isValidating) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Se não estiver autenticado, redirecionar para login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
   // Se estiver autenticado, renderizar o componente filho

@@ -4,8 +4,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 const FAQSection = () => {
+  const { config } = useSiteConfig();
   const faqs = [
     {
       question: "Qual o prazo para ingressar com ação trabalhista após a demissão?",
@@ -30,13 +32,13 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 section-gradient">
+    <section className="py-16 md:py-32" style={{ backgroundColor: config?.secondaryColor || '#FFE951' }}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: '#000000' }}>
             Dúvidas Frequentes em Direito Trabalhista
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl max-w-3xl mx-auto leading-relaxed font-bold" style={{ color: '#000000' }}>
             Esclarecemos as principais questões sobre direitos trabalhistas com base 
             na legislação vigente e jurisprudência consolidada.
           </p>
@@ -48,12 +50,13 @@ const FAQSection = () => {
               <AccordionItem 
                 key={index} 
                 value={`item-${index}`}
-                className="border border-border rounded-lg px-6 bg-card card-shadow"
+                className="border-6 border-black px-6 bg-white"
+                style={{ boxShadow: '8px 8px 0px #000000' }}
               >
-                <AccordionTrigger className="text-left text-lg font-medium text-primary hover:text-primary/80 py-6">
+                <AccordionTrigger className="text-left text-lg font-bold py-6 hover:translate-x-1 transition-transform" style={{ color: '#000000' }}>
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
+                <AccordionContent className="leading-relaxed pb-6 font-medium" style={{ color: '#000000' }}>
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -62,8 +65,8 @@ const FAQSection = () => {
         </div>
 
         <div className="text-center mt-12">
-          <div className="inline-block bg-primary/5 px-6 py-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
+          <div className="inline-block bg-white px-6 py-4 border-4 border-black" style={{ boxShadow: '8px 8px 0px #000000' }}>
+            <p className="text-sm font-bold" style={{ color: '#000000' }}>
               <strong>Importante:</strong> As informações apresentadas têm caráter geral e informativo. 
               Cada caso possui particularidades que devem ser analisadas individualmente por profissional especializado.
             </p>

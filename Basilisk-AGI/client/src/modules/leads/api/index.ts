@@ -9,8 +9,10 @@ import {
   StatusOptionsResponse 
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-const API_KEY = 'your_secure_api_key_here_32_characters_long';
+import { API_CONFIG } from '@/config/api';
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
+const API_KEY = API_CONFIG.API_KEY;
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',

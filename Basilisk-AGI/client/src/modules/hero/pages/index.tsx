@@ -1,109 +1,170 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Shield, Heart, Award } from "lucide-react";
 import { useState, useEffect } from "react";
+import { CheckCircle2, TrendingUp, Users, Award, Target, Zap, Shield, Heart, GraduationCap, Star } from "lucide-react";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
+import { useDesignSystem } from "@/hooks/useDesignSystem";
+import {
+  SplitCenterLayout,
+  FullWidthLayout,
+  OverlapLayout,
+  ZigzagLayout,
+  CardsGridLayout,
+  MinimalLayout,
+  AsymmetricLayout,
+  FloatingLayout
+} from '../layouts';
+import { HeroSkeleton } from "@/components/ui/hero-skeleton";
+
+const iconMap: Record<string, any> = {
+  Award, Shield, Heart, GraduationCap, Users, Star, TrendingUp, Target, Zap, CheckCircle2
+};
 
 const HeroSection = () => {
-  const [titleVisible, setTitleVisible] = useState(false);
-  const [highlightsVisible, setHighlightsVisible] = useState(false);
+  const { config, isLoading } = useSiteConfig();
+  const { systemName } = useDesignSystem();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    // Animação escalonada
-    const titleTimer = setTimeout(() => setTitleVisible(true), 300);
-    const highlightsTimer = setTimeout(() => setHighlightsVisible(true), 800);
-
-    return () => {
-      clearTimeout(titleTimer);
-      clearTimeout(highlightsTimer);
-    };
-  }, []);
-
-  const highlights = [
+  // Slides do carrossel - usa configuração customizável ou padrão
+  const defaultSlides = [
     {
-      icon: <Award className="w-6 h-6" />,
-      text: "Especialista em Direito Trabalhista há mais de 30 anos"
+      title: config?.heroTitle || "Bem-vindo",
+      subtitle: config?.heroSubtitle || "Sua solução completa",
+      cta: config?.heroCtaText || "Comece Agora",
+      imageUrl: config?.heroImage,
+      imageId: undefined
     },
     {
-      icon: <Shield className="w-6 h-6" />,
-      text: "Total conformidade com as normas éticas da OAB"
+      title: "Resultados Comprovados",
+      subtitle: "Mais de 1000 clientes satisfeitos com nossos serviços",
+      cta: config?.heroCtaText || "Comece Agora",
+      imageUrl: config?.heroImage,
+      imageId: undefined
     },
     {
-      icon: <Heart className="w-6 h-6" />,
-      text: "Horário de Atendimento de Segunda a Sexta: 9h às 18h"
+      title: "Atendimento Premium",
+      subtitle: "Suporte dedicado 24/7 para você",
+      cta: config?.heroCtaText || "Comece Agora",
+      imageUrl: config?.heroImage,
+      imageId: undefined
     }
   ];
 
+  const slides = config?.heroSlides && config.heroSlides.length > 0 
+    ? config.heroSlides 
+    : defaultSlides;
+
+  // Autoplay do carrossel
+  useEffect(() => {
+    if (!config?.heroEnabled) return;
+    
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 6000); // Troca a cada 6 segundos
+
+    return () => clearInterval(interval);
+  }, [currentSlide, config?.heroEnabled]);
+
+  const nextSlide = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  const prevSlide = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  if (isLoading || !config) {
+    return <HeroSkeleton />;
+  }
+
+  if (!config.heroEnabled) {
+    return null;
+  }
+
+  const highlights = config.heroHighlights || [];
+  const currentSlideData = slides[currentSlide];
+
+  // Cores dinâmicas do sistema
+  const primaryColor = config?.primaryColor || '#FFE951';
+  const secondaryColor = config?.secondaryColor || '#4ECDC4';
+
+  // Determinar cor de fundo baseada no sistema de design
+  const getBackgroundColor = () => {
+    if (systemName === 'minimalism') {
+      // No minimalismo, usar tema claro/escuro
+      const isDark = config?.siteTheme === 'dark';
+      return isDark ? '#111827' : '#f9fafb';
+    } else {
+      // No neobrutalism, usar cor primária
+      return primaryColor;
+    }
+  };
+
+  const backgroundColor = getBackgroundColor();
+  const textColor = config?.siteTheme === 'dark' ? '#ffffff' : '#1a1a1a';
+
+  // Pegar imagem do slide atual
+  const currentSlideImage = (currentSlideData as any).imageUrl || (currentSlideData as any).imageId;
+  
+  const heroLayout = config.heroLayout || 'split-center';
+
+  // Props comuns para todos os layouts
+  const layoutProps = {
+    slides,
+    currentSlide,
+    prevSlide,
+    nextSlide,
+    setCurrentSlide,
+    highlights,
+    iconMap,
+    config,
+    currentSlideImage,
+    primaryColor,
+    secondaryColor,
+    bgColor: backgroundColor,
+    textColor
+  };
+
+  // Renderizar layout baseado na escolha
+  const renderLayout = () => {
+    switch (heroLayout) {
+      case 'split-center':
+        return <SplitCenterLayout {...layoutProps} />;
+      case 'full-width':
+        return <FullWidthLayout {...layoutProps} />;
+      case 'overlap':
+        return <OverlapLayout {...layoutProps} />;
+      case 'zigzag':
+        return <ZigzagLayout {...layoutProps} />;
+      case 'cards-grid':
+        return <CardsGridLayout {...layoutProps} />;
+      case 'minimal':
+        return <MinimalLayout {...layoutProps} />;
+      case 'asymmetric':
+        return <AsymmetricLayout {...layoutProps} />;
+      case 'floating':
+        return <FloatingLayout {...layoutProps} />;
+      default:
+        return <SplitCenterLayout {...layoutProps} />;
+    }
+  };
+
   return (
-    <section id="inicio" className="pt-4 md:pt-32 pb-16 min-h-screen flex items-center">
-      <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <h1 className={`text-4xl lg:text-6xl font-playfair font-bold text-primary leading-tight transition-all duration-1000 ease-out ${
-                titleVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              }`}>
-                Soluções Trabalhistas com
-                <span className="text-brown-dark"> Excelência</span>
-                <span className="text-gold-accent"> e Ética</span>
-              </h1>
-              
-              <p className={`text-xl text-muted-foreground leading-relaxed transition-all duration-1000 ease-out ${
-                titleVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              }`} style={{ transitionDelay: '0.3s' }}>
-                Defendendo seus direitos trabalhistas com expertise 
-                e compromisso total com seus interesses
-              </p>
-            </div>
-
-            <div className="flex justify-center">
-              <Button 
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
-                onClick={() => window.open('https://wa.me/558391090902?text=Olá, gostaria de uma consulta sobre meus direitos trabalhistas.', '_blank')}
-              >
-                Fale com um Especialista
-              </Button>
-            </div>
-
-            {/* Highlights */}
-            <div className="grid gap-4 mt-1">
-              {highlights.map((highlight, index) => (
-                <Card 
-                  key={index} 
-                  className={`p-4 card-shadow border-4 border-primary bg-primary/5 rounded-lg transition-all duration-700 ease-out ${
-                    highlightsVisible ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'
-                  }`}
-                  style={{ transitionDelay: `${index * 200}ms` }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-6 h-6 text-primary">
-                        {highlight.icon}
-                      </div>
-                    </div>
-                    <p className="text-lg  text-primary">
-                      {highlight.text}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Image - Hidden on mobile */}
-          <div className="relative hidden md:block">
-            <div className="relative overflow-hidden rounded-2xl elegant-shadow">
-              <img
-                src="https://res.cloudinary.com/dkcrbcfcy/image/upload/v1758590979/maia-advocacia/lvql1q9gchj5owiubyg4.jpg"
-                alt="Escritório de advocacia profissional"
-                className="w-full h-[600px] object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <section 
+      id="inicio" 
+      className={`min-h-screen flex items-center justify-center transition-colors duration-500 relative overflow-hidden ${
+        systemName === 'minimalism' ? 'pt-20' : ''
+      }`}
+      style={{
+        background: backgroundColor
+      }}
+    >
+      {renderLayout()}
     </section>
   );
 };

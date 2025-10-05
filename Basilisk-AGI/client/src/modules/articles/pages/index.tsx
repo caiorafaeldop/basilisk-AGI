@@ -18,7 +18,7 @@ const BlogSection = () => {
   
   // Verificar estado de admin
   const checkAdminStatus = () => {
-    const hasToken = localStorage.getItem('authToken');
+    const hasToken = localStorage.getItem('token');
     const hasUser = localStorage.getItem('user');
     setIsAdmin(!!(hasToken && hasUser));
   };

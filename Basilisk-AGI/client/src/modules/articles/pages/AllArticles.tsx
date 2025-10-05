@@ -20,11 +20,13 @@ import { articlesApi } from "../api";
 import { Article } from "../types";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { ArticleGridSkeleton } from "@/components/ui/article-skeleton";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 const AllArticles = () => {
   useScrollToTop(); // Hook para scroll automático ao topo
   
   const navigate = useNavigate();
+  const { config } = useSiteConfig();
   const [articles, setArticles] = useState<Article[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ const AllArticles = () => {
   
   // Verificar estado de admin
   const checkAdminStatus = () => {
-    const hasToken = localStorage.getItem('authToken');
+    const hasToken = localStorage.getItem('token');
     const hasUser = localStorage.getItem('user');
     setIsAdmin(!!(hasToken && hasUser));
   };
@@ -149,9 +151,11 @@ const AllArticles = () => {
     navigate(`/artigo/${articleId}`);
   };
 
+  const bgColor = config?.siteTheme === 'dark' ? '#1e293b' : '#f7f7f8';
+
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: bgColor }}>
         <Header />
         <main className="container mx-auto px-4 py-8 mt-32">
           {/* Título skeleton */}
@@ -184,7 +188,7 @@ const AllArticles = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: bgColor }}>
       <Header />
       <main className="container mx-auto px-4 py-8 mt-32">
         {/* Cabeçalho */}

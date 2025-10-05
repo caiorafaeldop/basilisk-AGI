@@ -8,8 +8,10 @@ import {
   CategoriesResponse 
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-const API_KEY = 'your_secure_api_key_here_32_characters_long';
+import { API_CONFIG } from '@/config/api';
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
+const API_KEY = API_CONFIG.API_KEY;
 
 // Dados mock para fallback quando a API não estiver disponível
 const MOCK_ARTICLES: Article[] = [
@@ -92,7 +94,8 @@ export const articlesApi = {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch articles');
+        const errorText = await response.text().catch(() => 'Unknown error');
+        throw new Error(`Failed to fetch articles: ${response.status} ${errorText}`);
       }
 
       const data = await response.json();
@@ -112,8 +115,10 @@ export const articlesApi = {
         throw new Error('Formato de dados inválido');
       }
     } catch (error) {
-      console.warn('API não disponível, usando dados mock:', error);
-      // Retornar dados mock quando a API não estiver disponível
+      if (import.meta.env.DEV) {
+        console.warn('API não disponível, usando dados mock:', error);
+      }
+      // Retornar dados mock quando a API não estiver disponível (apenas em dev)
       return {
         success: true,
         count: MOCK_ARTICLES.length,

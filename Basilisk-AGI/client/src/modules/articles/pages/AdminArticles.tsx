@@ -14,12 +14,10 @@ import {
   Home,
   AlertCircle
 } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { articlesApi } from "../api";
 import { Article } from "../types";
 import { useModal } from "@/hooks/useModal";
-import { AdminArticlesSkeleton } from "@/components/ui/admin-skeleton";
+import { PageShell } from "@/components/layout/PageShell";
 
 const AdminArticles = () => {
   const navigate = useNavigate();
@@ -97,38 +95,23 @@ const AdminArticles = () => {
     setCurrentPage(page);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <AdminArticlesSkeleton />
-        <Footer />
-      </div>
-    );
-  }
+  const actions = (
+    <Button 
+      className="bg-primary hover:bg-primary/90"
+      onClick={() => navigate('/admin/artigos/novo')}
+    >
+      <Plus className="w-4 h-4 mr-2" />
+      Novo Artigo
+    </Button>
+  );
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="container mx-auto px-4 py-8 mt-32">
-        {/* Cabeçalho */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-playfair font-bold text-primary mb-2">
-              Gerenciar Artigos
-            </h1>
-            <p className="text-muted-foreground">
-              Gerencie seus artigos e selecione quais aparecerão na tela inicial
-            </p>
-          </div>
-          <Button 
-            className="bg-primary hover:bg-primary/90"
-            onClick={() => navigate('/admin/artigos/novo')}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Artigo
-          </Button>
-        </div>
+    <PageShell
+      title="Gerenciar Artigos"
+      subtitle="Gerencie seus artigos e selecione quais aparecerão na tela inicial"
+      actions={actions}
+      loading={loading}
+    >
 
         {/* Informações sobre homepage */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
@@ -261,9 +244,7 @@ const AdminArticles = () => {
             </Button>
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 };
 

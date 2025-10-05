@@ -11,6 +11,8 @@ import { ArticleModule } from './article/article.module';
 import { UploadModule } from './upload/upload.module';
 import { LeadModule } from './lead/lead.module';
 import { TeamModule } from './team/team.module';
+import { SiteConfigModule } from './site-config/site-config.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { TeamModule } from './team/team.module';
     UploadModule,
     LeadModule,
     TeamModule,
+    SiteConfigModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [
