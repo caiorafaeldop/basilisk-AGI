@@ -1,8 +1,6 @@
----
 
 **Transforme qualquer negócio em uma landing page profissional em minutos!**
 
----
 
 *Desenvolvido para ser totalmente customizável*
 
