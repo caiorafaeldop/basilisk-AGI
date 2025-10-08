@@ -18,6 +18,7 @@ export class SiteConfig {
 
   // Branding
   siteName: string;
+  slug: string; // URL-friendly identifier (gerado a partir do siteName)
   logo?: string;
   favicon?: string;
 

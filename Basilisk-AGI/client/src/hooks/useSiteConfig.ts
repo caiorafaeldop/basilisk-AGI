@@ -25,7 +25,9 @@ export const useSiteConfig = () => {
       showSuccess('Configurações atualizadas com sucesso!');
     },
     onError: (error) => {
-      console.error('Erro ao atualizar configurações:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao atualizar configurações:', error);
+      }
       showError('Erro ao atualizar configurações. Tente novamente.');
     },
   });
@@ -37,7 +39,9 @@ export const useSiteConfig = () => {
       showSuccess('Configurações resetadas para valores padrão!');
     },
     onError: (error) => {
-      console.error('Erro ao resetar configurações:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao resetar configurações:', error);
+      }
       showError('Erro ao resetar configurações. Tente novamente.');
     },
   });
@@ -45,7 +49,7 @@ export const useSiteConfig = () => {
   const { data: isFirstSetup } = useQuery({
     queryKey: ['site-config-first-setup'],
     queryFn: siteConfigApi.isFirstSetup,
-    staleTime: 1000 * 60 * 10, // 10 minutos
+    staleTime: 1000 * 30, // 30 segundos (reduzido de 10 minutos)
   });
 
   return {

@@ -18,20 +18,25 @@ export const RootRedirect = ({ children }: { children: React.ReactNode }) => {
     // Aguardar validação de auth e config
     if (isValidating || isLoading) return;
 
-    // Se é primeira configuração e não está logado → login
-    if (isFirstSetup && !isAuthenticated) {
+    // Se está logado, sempre permitir acesso (não redirecionar)
+    if (isAuthenticated) return;
+
+    // APENAS redirecionar se NÃO está logado
+
+    // Se é primeira configuração → login
+    if (isFirstSetup) {
       navigate('/login', { replace: true });
       return;
     }
 
-    // Se site não tem conteúdo e não está logado → login
+    // Se site não tem conteúdo → login
     const hasContent = config && (
       config.siteName !== 'Meu Site' ||
       config.heroTitle ||
       config.logo
     );
 
-    if (!hasContent && !isAuthenticated) {
+    if (!hasContent) {
       navigate('/login', { replace: true });
     }
   }, [isAuthenticated, isValidating, isFirstSetup, isLoading, config, navigate]);

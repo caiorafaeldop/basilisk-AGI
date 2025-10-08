@@ -1,5 +1,5 @@
-import { Controller, Get, Put, Body, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Put, Body, Post, Param, NotFoundException } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { SiteConfigService } from './site-config.service';
 import { UpdateSiteConfigDto } from './dto/update-site-config.dto';
 import { SiteConfig } from './site-config.entity';
@@ -16,6 +16,20 @@ export class SiteConfigController {
   @ApiResponse({ status: 200, description: 'Returns site configuration' })
   async getConfig(): Promise<SiteConfig> {
     return this.siteConfigService.getConfig();
+  }
+
+  @PublicRoute()
+  @Get('by-slug/:slug')
+  @ApiOperation({ summary: 'Get site configuration by slug (public)' })
+  @ApiParam({ name: 'slug', description: 'Site slug', example: 'connecta_CI_-_UFPB' })
+  @ApiResponse({ status: 200, description: 'Returns site configuration' })
+  @ApiResponse({ status: 404, description: 'Site not found' })
+  async getConfigBySlug(@Param('slug') slug: string): Promise<SiteConfig> {
+    const config = await this.siteConfigService.getConfigBySlug(slug);
+    if (!config) {
+      throw new NotFoundException(`Site with slug "${slug}" not found`);
+    }
+    return config;
   }
 
   @PublicRoute()

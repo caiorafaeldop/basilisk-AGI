@@ -24,12 +24,12 @@ export const Login = () => {
     name: "",
   });
 
-  // Redirecionar se já estiver logado
+  // Redirecionar se já estiver logado (apenas no mount inicial)
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/admin", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, []); // Apenas uma vez no mount
 
   const validateEmail = (email: string): { valid: boolean; message: string } => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -94,10 +94,18 @@ export const Login = () => {
       if (isLogin) {
         // Login
         await login(formData.email, formData.password);
+        
+        // Disparar evento para atualizar componentes
+        window.dispatchEvent(new CustomEvent('authChange'));
+        
         toast({
           title: "Login realizado!",
           description: "Bem-vindo de volta!",
         });
+        
+        // Pequeno delay para garantir que todos os componentes processem o evento
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         navigate("/admin");
       } else {
         // Register
@@ -106,14 +114,24 @@ export const Login = () => {
           email: formData.email,
           password: formData.password,
         });
+        
+        // Disparar evento para atualizar componentes
+        window.dispatchEvent(new CustomEvent('authChange'));
+        
         toast({
           title: "Conta criada!",
           description: "Sua conta foi criada com sucesso.",
         });
+        
+        // Pequeno delay para garantir que todos os componentes processem o evento
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         navigate("/admin/site-config");
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
+      if (import.meta.env.DEV) {
+        console.error("Auth error:", error);
+      }
       
       let errorMessage = 'Erro desconhecido';
       

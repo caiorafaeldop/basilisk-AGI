@@ -18,8 +18,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
+  // Verificação dupla: useAuth + localStorage direto (fallback para race conditions)
+  const hasToken = localStorage.getItem('token');
+  const hasUser = localStorage.getItem('user');
+  const isActuallyAuthenticated = isAuthenticated || (hasToken && hasUser);
+
   // Se não estiver autenticado, redirecionar para login
-  if (!isAuthenticated) {
+  if (!isActuallyAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

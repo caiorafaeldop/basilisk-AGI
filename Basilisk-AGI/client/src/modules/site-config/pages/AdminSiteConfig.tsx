@@ -1407,24 +1407,6 @@ const AdminSiteConfig = () => {
                         </button>
                       </div>
                     </div>
-
-                    {/* Info */}
-                    <div 
-                      className="p-4 border-4 border-black transition-all duration-300"
-                      style={{
-                        backgroundColor: '#FFE951',
-                        boxShadow: '6px 6px 0px #000000'
-                      }}
-                    >
-                      <p 
-                        className="text-sm font-bold transition-colors duration-300"
-                        style={{ 
-                          color: '#000000'
-                        }}
-                      >
-                        💡 As cores são aplicadas em tempo real com estilo neobrutalism! Bordas e sombras sempre pretas, cores customizáveis.
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>

@@ -43,7 +43,7 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = async (isInitial = false) => {
       const storedUser = localStorage.getItem('user');
       const token = localStorage.getItem('token');
       
@@ -56,27 +56,55 @@ export const useAuth = () => {
           setIsAuthenticated(true);
           setIsAdmin(userData.role === 'admin');
           
-          // Validar token com backend (sempre retorna true por enquanto)
-          const isValid = await validateToken(token);
-          
-          if (!isValid) {
-            setUser(null);
-            setIsAuthenticated(false);
-            setIsAdmin(false);
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
+          // Validar token com backend apenas se necessário
+          if (isInitial) {
+            const isValid = await validateToken(token);
+            
+            if (!isValid) {
+              setUser(null);
+              setIsAuthenticated(false);
+              setIsAdmin(false);
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+            }
           }
         } catch (error) {
-          console.error('Erro ao carregar dados do usuário:', error);
+          if (import.meta.env.DEV) {
+            console.error('Erro ao carregar dados do usuário:', error);
+          }
           localStorage.removeItem('user');
           localStorage.removeItem('token');
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsAdmin(false);
         }
+      } else {
+        // Sem token/user = não autenticado
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsAdmin(false);
       }
       
-      setIsValidating(false);
+      if (isInitial) {
+        setIsValidating(false);
+      }
     };
     
-    checkAuth();
+    // Check inicial com validação de token
+    checkAuth(true);
+    
+    // Escutar mudanças de autenticação (sem validar token novamente)
+    const handleAuthChange = () => {
+      checkAuth(false);
+    };
+    
+    window.addEventListener('authChange', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
+    return () => {
+      window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -108,6 +136,10 @@ export const useAuth = () => {
     setIsAdmin(userData.role === 'admin');
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', data.accessToken);
+    
+    // Disparar evento para sincronizar outros componentes
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('authChange'));
   };
 
   const register = async (data: RegisterData) => {
@@ -139,6 +171,10 @@ export const useAuth = () => {
     setIsAdmin(userData.role === 'admin');
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', responseData.accessToken);
+    
+    // Disparar evento para sincronizar outros componentes
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('authChange'));
   };
 
   const logout = async () => {
@@ -167,6 +203,10 @@ export const useAuth = () => {
       setIsAdmin(false);
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      
+      // Disparar evento para sincronizar outros componentes
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('authChange'));
     }
   };
 

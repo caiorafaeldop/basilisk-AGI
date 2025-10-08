@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { usePublicPage } from "@/contexts/PublicPageContext";
 import { 
-  Settings, FileText, MessageSquare, Users, Quote, LogOut, ChevronRight, Loader2,
+  Settings, FileText, MessageSquare, Users, Quote, LogOut, LogIn, ChevronRight, Loader2,
   LayoutDashboard, Image, Video, DollarSign, HelpCircle, Phone, MapPin, Home
 } from "lucide-react";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
@@ -23,6 +24,8 @@ interface MenuItem {
 
 export const AdminSideMenu = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isPublicPage } = usePublicPage();
   const { config: siteConfig } = useSiteConfig();
   const { logout, isAuthenticated } = useAuth();
   const { systemName } = useDesignSystem();
@@ -32,6 +35,11 @@ export const AdminSideMenu = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
 
+  // Se for página pública, não renderizar
+  if (isPublicPage) {
+    return null;
+  }
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -40,9 +48,19 @@ export const AdminSideMenu = () => {
         title: "Logout realizado",
         description: "Até logo!",
       });
-      navigate('/login');
+      
+      // Se o site tem conteúdo público, ir para home. Senão, login
+      const hasContent = siteConfig && (
+        siteConfig.siteName !== 'Meu Site' ||
+        siteConfig.heroTitle ||
+        siteConfig.logo
+      );
+      
+      navigate(hasContent ? '/' : '/login');
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao fazer logout:', error);
+      }
       toast({
         title: "Erro ao sair",
         description: "Tente novamente",
@@ -52,6 +70,23 @@ export const AdminSideMenu = () => {
       setIsLoggingOut(false);
     }
   };
+
+  // Forçar re-render quando autenticação mudar
+  const [authKey, setAuthKey] = useState(0);
+  
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setAuthKey(prev => prev + 1);
+    };
+    
+    window.addEventListener('authChange', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
+    return () => {
+      window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
 
   // Fechar menu ao clicar fora
   useEffect(() => {
@@ -143,10 +178,28 @@ export const AdminSideMenu = () => {
     setOpenSubmenu(null);
   };
 
-  // Mostrar menu apenas se estiver autenticado (não depende da rota)
-  if (!isAuthenticated) {
-    return null;
-  }
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  // Verificar se uma rota está ativa
+  const isRouteActive = (subItems: SubMenuItem[]) => {
+    return subItems.some(item => location.pathname === item.path);
+  };
+
+  // Filtrar menu items baseado na autenticação
+  const getVisibleMenuItems = () => {
+    if (!isAuthenticated) {
+      // Usuário não logado: apenas Início e Dashboard
+      return menuItems.filter(item => 
+        item.label === "Início" || item.label === "Dashboard"
+      );
+    }
+    // Usuário logado: todos os menus
+    return menuItems;
+  };
+
+  const visibleMenuItems = getVisibleMenuItems();
 
   return (
     <>
@@ -220,9 +273,10 @@ export const AdminSideMenu = () => {
           {/* Menu Items */}
           <div className="flex-1 overflow-y-auto px-2 py-4">
             <div className="space-y-1">
-              {menuItems.map((item) => {
+              {visibleMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isOpen = openSubmenu === item.label;
+                const isActive = isRouteActive(item.subItems);
                 
                 return (
                   <div key={item.label} className="relative">
@@ -235,9 +289,9 @@ export const AdminSideMenu = () => {
                         systemName === 'minimalism'
                           ? 'rounded-lg hover:-translate-y-0.5'
                           : 'rounded-xl hover:translate-x-0.5 hover:translate-y-0.5'
-                      } ${isOpen ? (systemName === 'minimalism' ? '-translate-y-0.5' : 'translate-x-0.5 translate-y-0.5') : ''}`}
+                      } ${isOpen || isActive ? (systemName === 'minimalism' ? '-translate-y-0.5' : 'translate-x-0.5 translate-y-0.5') : ''}`}
                       style={{
-                        backgroundColor: isOpen ? 'var(--sidebar-item-hover-bg)' : 'transparent',
+                        backgroundColor: (isOpen || isActive) ? 'var(--sidebar-item-hover-bg)' : 'transparent',
                         color: 'var(--sidebar-text-color)',
                         borderColor: 'var(--sidebar-border-color)',
                         boxShadow: 'var(--sidebar-shadow)'
@@ -296,43 +350,69 @@ export const AdminSideMenu = () => {
 
           <div className="border-t my-2" style={{ borderColor: 'var(--sidebar-border-color)' }} />
 
-          {/* Logout Button - Altura fixa */}
+          {/* Login/Logout Button - Altura fixa */}
           <div className="p-2">
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className={`w-full h-12 flex items-center ${
-                isExpanded ? 'gap-3 px-3' : 'justify-center px-2'
-              } border font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                systemName === 'minimalism'
-                  ? 'rounded-lg hover:-translate-y-0.5'
-                  : 'rounded-xl hover:translate-x-0.5 hover:translate-y-0.5'
-              }`}
-              style={{
-                backgroundColor: '#FF6B6B',
-                color: systemName === 'minimalism' ? '#ffffff' : '#000000',
-                borderColor: 'var(--sidebar-border-color)',
-                boxShadow: 'var(--sidebar-shadow)'
-              }}
-              title={!isExpanded ? 'Sair' : ''}
-              aria-label="Sair do sistema"
-            >
-              {isLoggingOut ? (
-                <>
-                  <Loader2 className="w-5 h-5 flex-shrink-0 animate-spin" aria-hidden="true" />
-                  {isExpanded && (
-                    <span className="text-sm">Saindo...</span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <LogOut className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-                  {isExpanded && (
-                    <span className="text-sm">Sair</span>
-                  )}
-                </>
-              )}
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className={`w-full h-12 flex items-center ${
+                  isExpanded ? 'gap-3 px-3' : 'justify-center px-2'
+                } border font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  systemName === 'minimalism'
+                    ? 'rounded-lg hover:-translate-y-0.5'
+                    : 'rounded-xl hover:translate-x-0.5 hover:translate-y-0.5'
+                }`}
+                style={{
+                  backgroundColor: '#FF6B6B',
+                  color: systemName === 'minimalism' ? '#ffffff' : '#000000',
+                  borderColor: 'var(--sidebar-border-color)',
+                  boxShadow: 'var(--sidebar-shadow)'
+                }}
+                title={!isExpanded ? 'Sair' : ''}
+                aria-label="Sair do sistema"
+              >
+                {isLoggingOut ? (
+                  <>
+                    <Loader2 className="w-5 h-5 flex-shrink-0 animate-spin" aria-hidden="true" />
+                    {isExpanded && (
+                      <span className="text-sm">Saindo...</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                    {isExpanded && (
+                      <span className="text-sm">Sair</span>
+                    )}
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className={`w-full h-12 flex items-center ${
+                  isExpanded ? 'gap-3 px-3' : 'justify-center px-2'
+                } border font-bold transition-all ${
+                  systemName === 'minimalism'
+                    ? 'rounded-lg hover:-translate-y-0.5'
+                    : 'rounded-xl hover:translate-x-0.5 hover:translate-y-0.5'
+                }`}
+                style={{
+                  backgroundColor: '#4ECDC4',
+                  color: systemName === 'minimalism' ? '#ffffff' : '#000000',
+                  borderColor: 'var(--sidebar-border-color)',
+                  boxShadow: 'var(--sidebar-shadow)'
+                }}
+                title={!isExpanded ? 'Entrar' : ''}
+                aria-label="Fazer login no sistema"
+              >
+                <LogIn className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                {isExpanded && (
+                  <span className="text-sm">Entrar</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </aside>

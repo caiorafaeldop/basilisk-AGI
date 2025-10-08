@@ -1,15 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Menu, Phone, Mail, X, Eye, EyeOff, LogOut, Shield, ChevronDown, FileText, MessageSquare, Quote, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { config } from "@/config/env";
+import { useModal } from "@/hooks/useModal";
 import { authApi } from "@/modules/auth/api";
 import { useAuth } from "@/hooks/useAuth";
-import { useModal } from "@/hooks/useModal";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { nb } from "@/styles/neobrutalism";
 import { useDesignSystem } from "@/hooks/useDesignSystem";
@@ -17,7 +15,7 @@ import { useDesignSystem } from "@/hooks/useDesignSystem";
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isAuthenticated, user, logout } = useAuth();
+  const { isAdmin, isAuthenticated, logout } = useAuth();
   const { showError } = useModal();
   const { config: siteConfig } = useSiteConfig();
   const { systemName } = useDesignSystem();
@@ -33,12 +31,23 @@ const Header = () => {
 
   // Verificar se o usuário está logado ao carregar o componente
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      setIsLoggedIn(!!(token && user));
+    };
     
-    if (token && user) {
-      setIsLoggedIn(true);
-    }
+    // Verificar status inicial
+    checkAuthStatus();
+    
+    // Escutar mudanças de autenticação
+    window.addEventListener('authChange', checkAuthStatus);
+    window.addEventListener('storage', checkAuthStatus);
+    
+    return () => {
+      window.removeEventListener('authChange', checkAuthStatus);
+      window.removeEventListener('storage', checkAuthStatus);
+    };
   }, []);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,9 +83,8 @@ const Header = () => {
         password: adminCredentials.password
       });
       
-      // Salvar token no localStorage
-      localStorage.setItem('authToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
+      // Salvar token no localStorage (usando 'token' para consistência)
+      localStorage.setItem('token', response.accessToken);
       localStorage.setItem('user', JSON.stringify(response.user));
       
       // Atualizar estado de login
@@ -90,25 +98,31 @@ const Header = () => {
       window.dispatchEvent(new CustomEvent('authChange'));
       
     } catch (error) {
-      console.error('Erro no login:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro no login:', error);
+      }
       showError('Credenciais inválidas. Verifique email e senha.');
     } finally {
       setIsLoggingIn(false);
     }
   };
 
-  const handleLogout = () => {
-    // Limpar tokens do localStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    
-    // Atualizar estado
-    setIsLoggedIn(false);
-    setShowLogoutModal(false);
-    
-    // Disparar evento para outros componentes
-    window.dispatchEvent(new CustomEvent('authChange'));
+  const handleLogout = async () => {
+    try {
+      // Usar logout oficial do useAuth
+      await logout();
+      
+      // Atualizar estado local
+      setIsLoggedIn(false);
+      setShowLogoutModal(false);
+      
+      // Disparar evento para outros componentes
+      window.dispatchEvent(new CustomEvent('authChange'));
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Erro ao fazer logout:', error);
+      }
+    }
   };
 
   const handleAdminClick = () => {

@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
+import PublicSite from "./pages/PublicSite";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import { AdminArticles, AllArticles, ArticleView, ArticleEditor } from "@/modules/articles";
@@ -23,7 +24,7 @@ import { AdminSideMenu } from "@/components/admin/AdminSideMenu";
 import { SEOManager } from "@/components/SEOManager";
 import { GlobalTypography } from "@/components/GlobalTypography";
 import { HelmetProvider } from 'react-helmet-async';
-import { RootRedirect } from "@/components/RootRedirect";
+import { PublicPageProvider } from "@/contexts/PublicPageContext";
 
 // Enhanced admin pages
 import AdminArticlesEnhanced from "@/modules/articles/pages/AdminArticlesEnhanced";
@@ -52,16 +53,13 @@ const App = () => {
                 <Toaster />
                 <Sonner />
               <BrowserRouter>
-              {/* Sidebar global - sempre visível quando autenticado */}
+              <PublicPageProvider>
+              {/* Sidebar global - visível apenas em páginas admin */}
               <AdminSideMenu />
               
               <Routes>
-          {/* Rota pública principal */}
-          <Route path="/" element={
-            <RootRedirect>
-              <Index />
-            </RootRedirect>
-          } />
+          {/* Raiz sempre vai para login (SaaS) */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           
           {/* Auth */}
           <Route path="/login" element={<Login />} />
@@ -119,9 +117,14 @@ const App = () => {
           <Route path="/demo/depoimentos" element={<TestimonialsDemo />} />
           <Route path="/demo/equipe" element={<TeamDemo />} />
           
+          {/* Rota dinâmica para sites públicos por slug */}
+          {/* Exemplo: /connecta_CI_-_UFPB */}
+          <Route path="/:slug" element={<PublicSite />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </PublicPageProvider>
         </BrowserRouter>
               </DesignSystemProvider>
             </DynamicThemeProvider>
