@@ -1,8 +1,22 @@
+# 🦎 Basilisk AGI
 
 **Transforme qualquer negócio em uma landing page profissional em minutos!**
 
-
 *Desenvolvido para ser totalmente customizável*
+
+## 🎨 Sistema de Temas Dinâmicos
+
+**Com apenas um clique, alterne entre diferentes estilos de design:**
+
+### Tema Minimalista
+![Tema Minimalista ](Captura%20de%20tela%202025-10-08%20133213.png)
+
+### Tema  Neobrutalism 
+![Tema Neobrutalism](Captura%20de%20tela%202025-10-08%20133315.png)
+
+**✨ Troca instantânea de temas** - Sem necessidade de recarregar a página! Basta um clique no painel admin para transformar completamente o visual do seu site.
+
+---
 
 **🚀 VAMOS COMEÇAR! 🚀**
 
@@ -26,10 +40,11 @@ npm install && npm run dev
 
 ## 🎨 PRINCIPAIS FEATURES
 
+✅ **Sistema de Temas** - Alterne entre Neobrutalism e Minimalista com 1 clique  
 ✅ **78 campos** totalmente configuráveis  
 ✅ **9 categorias** organizadas no admin  
 ✅ **Wizard** de onboarding (4 passos)  
-✅ **Theme system** dinâmico  
+✅ **Theme system** dinâmico e responsivo  
 ✅ **Zero hardcode** - tudo configurável  
 ✅ **15+ validadores** prontos  
 ✅ **40+ helpers** úteis  

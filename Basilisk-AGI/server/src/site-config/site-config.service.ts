@@ -42,20 +42,6 @@ export class SiteConfigService {
   }
 
   /**
-   * Gera slug a partir do siteName
-   */
-  private generateSlug(siteName: string): string {
-    if (!siteName) return '';
-    
-    return siteName
-      .trim()
-      .replace(/\s+/g, '_') // Espaços viram underscore
-      .replace(/[^\w\-_]/g, '') // Remove caracteres especiais
-      .replace(/_{2,}/g, '_') // Remove underscores duplicados
-      .replace(/^_|_$/g, ''); // Remove underscores no início/fim
-  }
-
-  /**
    * Retorna a configuração ativa do site (sempre a primeira/única)
    * Se não existir, cria uma com valores padrão
    */
@@ -67,7 +53,6 @@ export class SiteConfigService {
       // Criar configuração padrão usando MongoAdapter (sem transação)
       const defaultConfig = {
         siteName: 'Meu Site',
-        slug: 'Meu_Site',
         primaryColor: '#8B4513',
         secondaryColor: '#D4AF37',
         accentColor: '#4A5568',
@@ -88,16 +73,8 @@ export class SiteConfigService {
         updatedAt: new Date(),
       };
 
-      try {
-        config = await this.prisma.siteConfig.create({ data: defaultConfig });
-      } catch (error) {
-        // Se falhar com Prisma (transação), usa MongoAdapter
-        if (error.code === 'P2031') {
-          config = await this.mongoAdapter.createDocument('SiteConfig', defaultConfig);
-        } else {
-          throw error;
-        }
-      }
+      // Usar MongoAdapter diretamente para evitar problemas de transação
+      config = await this.mongoAdapter.createDocument('SiteConfig', defaultConfig);
     }
 
     return this.transformPrismaConfig(config);
@@ -105,9 +82,10 @@ export class SiteConfigService {
 
   /**
    * Busca configuração por slug (para sites públicos)
+   * Nota: slug foi removido do schema, retorna a config única
    */
   async getConfigBySlug(slug: string): Promise<SiteConfig | null> {
-    const config = await this.mongoAdapter.findOne('SiteConfig', { slug });
+    const config = await this.mongoAdapter.findOne('SiteConfig', {});
     if (!config) return null;
     return this.transformPrismaConfig(config);
   }
@@ -127,11 +105,6 @@ export class SiteConfigService {
 
     // Converter arrays para JSON se necessário
     const data: any = { ...updateDto, updatedAt: new Date() };
-
-    // Se siteName mudou, regerar slug
-    if (data.siteName) {
-      data.slug = this.generateSlug(data.siteName);
-    }
 
     // Se useAutoHeaderColors = true e há primaryColor, calcular cores do header
     if (data.useAutoHeaderColors !== false) {
@@ -172,17 +145,9 @@ export class SiteConfigService {
       updatedAt: new Date(),
     };
     
-    try {
-      const config = await this.prisma.siteConfig.create({ data });
-      return this.transformPrismaConfig(config);
-    } catch (error) {
-      // Se falhar com transação, usa MongoAdapter
-      if (error.code === 'P2031') {
-        const config = await this.mongoAdapter.createDocument('SiteConfig', data);
-        return this.transformPrismaConfig(config);
-      }
-      throw error;
-    }
+    // Usar MongoAdapter diretamente para evitar problemas de transação
+    const config = await this.mongoAdapter.createDocument('SiteConfig', data);
+    return this.transformPrismaConfig(config);
   }
 
   /**
@@ -246,24 +211,13 @@ export class SiteConfigService {
       updatedAt: new Date(),
     };
 
-    try {
-      const reset = await this.prisma.siteConfig.update({
-        where: { id: config.id },
-        data: resetData,
-      });
-      return this.transformPrismaConfig(reset);
-    } catch (error) {
-      // Se falhar com transação, usa MongoAdapter
-      if (error.code === 'P2031') {
-        const reset = await this.mongoAdapter.updateDocument(
-          'SiteConfig',
-          { _id: config.id },
-          resetData,
-        );
-        return this.transformPrismaConfig(reset);
-      }
-      throw error;
-    }
+    // Usar MongoAdapter diretamente para evitar problemas de transação
+    const reset = await this.mongoAdapter.updateDocument(
+      'SiteConfig',
+      { _id: { $oid: config.id } },
+      resetData,
+    );
+    return this.transformPrismaConfig(reset);
   }
 
   /**

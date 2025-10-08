@@ -178,36 +178,16 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
-    const token = localStorage.getItem('token');
+    // Limpar localmente (logout client-side)
+    setUser(null);
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     
-    try {
-      // Invalidar token no backend
-      if (token) {
-        await fetch(`${API_CONFIG.BASE_URL}/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'x-api-key': API_CONFIG.API_KEY,
-          },
-        });
-      }
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao fazer logout no servidor:', error);
-      }
-      // Continua mesmo se falhar no backend
-    } finally {
-      // Limpar localmente sempre
-      setUser(null);
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      
-      // Disparar evento para sincronizar outros componentes
-      window.dispatchEvent(new Event('storage'));
-      window.dispatchEvent(new CustomEvent('authChange'));
-    }
+    // Disparar evento para sincronizar outros componentes
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('authChange'));
   };
 
   return {

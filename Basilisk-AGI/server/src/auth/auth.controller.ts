@@ -112,4 +112,17 @@ export class AuthController {
     const res = await this.authService.register(name, email, password, role);
     return res;
   }
+
+  @Post('logout')
+  @ApiOperation({ 
+    summary: 'User Logout',
+    description: 'Logout user (client-side token invalidation)' 
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout successful',
+  })
+  async logout() {
+    return { message: 'Logout successful' };
+  }
 }
